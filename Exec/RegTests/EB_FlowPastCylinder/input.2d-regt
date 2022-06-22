@@ -10,7 +10,6 @@ geometry.prob_hi     =  0.06 0.04 1.0  # x_hi y_hi (z_hi)
 peleLM.lo_bc = Inflow  Interior NoSlipWallAdiab 
 peleLM.hi_bc = Outflow Interior NoSlipWallAdiab 
 
-
 #-------------------------AMR CONTROL----------------------------
 amr.n_cell          = 64 32 64         # Level 0 number of cells in each direction   
 amr.v               = 1                # AMR verbose

@@ -1,6 +1,6 @@
 #include <PeleLM.H>
 #include <AMReX_ParmParse.H>
-#include <pmf.H>
+#include <PMF.H>
 
 void PeleLM::readProbParm()
 {

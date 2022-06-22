@@ -58,12 +58,12 @@ peleLM.closed_chamber = 1
 
 godunov.use_ppm = 0
 
-amr.plot_int = 10
-amr.max_step = 100000
+amr.plot_int = 100
+amr.max_step = 1000
 amr.dt_shrink = 0.1
 amr.dt_change_max = 1.1
 amr.max_dt = 0.5
-amr.stop_time = 0.05
+#amr.stop_time = 0.05
 amr.cfl = 0.7
 amr.derive_plot_vars = avg_pressure mag_vort mass_fractions
 

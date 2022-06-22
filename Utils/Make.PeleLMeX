@@ -1,7 +1,7 @@
-PELELMEX_HOME ?= /path/to/PeleLMeX
-AMREX_HOME ?= /path/to/AMREX
-PELE_PHYSICS_HOME ?= /path/to/PELE_PHYSICS_HOME
-AMREX_HYDRO_HOME ?= /path/to/AMREX_HYDRO_HOME
+PELELMEX_HOME ?= /home/maxdnz/PeleLMeX
+AMREX_HOME ?= /home/maxdnz/PeleProduction/Submodules/amrex
+PELE_PHYSICS_HOME ?= /home/maxdnz/PeleProduction/Submodules/PelePhysics
+AMREX_HYDRO_HOME ?= /home/maxdnz/PeleProduction/Submodules/AMReX-Hydro
 
 USE_SUNDIALS = TRUE
 BL_NO_FORT = TRUE

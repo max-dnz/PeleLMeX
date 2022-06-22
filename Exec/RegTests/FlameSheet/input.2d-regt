@@ -35,7 +35,7 @@ peleLM.incompressible = 0
 peleLM.rho = 1.17
 peleLM.mu = 0.0
 peleLM.use_wbar = 1
-peleLM.sdc_iterMax = 2
+peleLM.sdc_iterMax = 1
 peleLM.floor_species = 0
 
 peleLM.do_temporals = 1
@@ -43,13 +43,14 @@ peleLM.temporal_int = 2
 peleLM.mass_balance = 1
 
 #amr.restart = chk00005
-#amr.check_int = 2000
+amr.checkpoint_files_output = 1
+amr.check_int = 100
 amr.plot_int = 100
-amr.max_step = 20
+amr.max_step = 2000
 amr.dt_shrink = 0.0001
-amr.stop_time = 0.001
+#amr.stop_time = 0.1
 #amr.stop_time = 1.00
-amr.cfl = 0.5
+amr.cfl = 0.05
 amr.derive_plot_vars = avg_pressure mag_vort mass_fractions mixture_fraction progress_variable
 
 # ------------------- INPUTS DERIVED DIAGS ------------------
@@ -58,6 +59,7 @@ peleLM.mixtureFraction.format = Cantera
 peleLM.mixtureFraction.type   = mass
 peleLM.mixtureFraction.oxidTank = O2:0.233 N2:0.767
 peleLM.mixtureFraction.fuelTank = H2:0.5 CH4:0.5
+
 peleLM.progressVariable.format = Cantera
 peleLM.progressVariable.weights = CO:1.0 CO2:1.0
 peleLM.progressVariable.coldState = CO:0.0 CO2:0.0
@@ -75,15 +77,15 @@ mac_proj.verbose = 2
 nodal_proj.verbose = 2
 
 #--------------------REFINEMENT CONTROL------------------------
-#amr.refinement_indicators = temp
-#amr.temp.max_level     = 1
-#amr.temp.value_greater = 305
-#amr.temp.field_name    = temp
+amr.refinement_indicators = temp
+amr.temp.max_level     = 1
+amr.temp.value_greater = 305
+amr.temp.field_name    = temp
 
-#amr.refinement_indicators = magVort
-#amr.magVort.max_level     = 1
-#amr.magVort.value_greater = 500.0
-#amr.magVort.field_name    = mag_vort
+amr.refinement_indicators = magVort
+amr.magVort.max_level     = 1
+amr.magVort.value_greater = 500.0
+amr.magVort.field_name    = mag_vort
 
 amr.refinement_indicators = yH
 amr.yH.max_level     = 3

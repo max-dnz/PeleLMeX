@@ -47,7 +47,10 @@ peleLM.mass_balance = 1
 #amr.restart = chk00700
 amr.check_int = 20
 amr.plot_int = 20
-amr.max_step = 1000
+
+amr.max_step = 1
+#amr.max_step = 1000
+
 amr.dt_shrink = 0.0001
 amr.stop_time = 1.0
 #amr.stop_time = 1.00

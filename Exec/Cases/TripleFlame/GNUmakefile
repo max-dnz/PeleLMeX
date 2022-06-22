@@ -1,6 +1,6 @@
-TOP = ../../../..
+TOP = /home/maxdnz/PeleProduction/Submodules
 AMREX_HOME         ?= ${TOP}/amrex
-PELELMEX_HOME      ?= ${TOP}/PeleLMeX
+PELELMEX_HOME      ?= /home/maxdnz/PeleLMeX
 PELE_PHYSICS_HOME  ?= ${TOP}/PelePhysics
 
 
@@ -13,7 +13,7 @@ TINY_PROFILE    = FALSE
 
 # Compilation
 COMP            = gnu
-USE_MPI         = TRUE
+USE_MPI         = FALSE
 USE_OMP         = FALSE
 USE_CUDA        = FALSE
 USE_HIP         = FALSE

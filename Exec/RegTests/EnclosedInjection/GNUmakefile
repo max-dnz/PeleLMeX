@@ -1,12 +1,12 @@
-TOP = ../../../..
+TOP = /home/maxdnz/PeleLMeX/Submodules
 AMREX_HOME         ?= ${TOP}/amrex
-PELELMEX_HOME      ?= ${TOP}/PeleLMeX
+PELELMEX_HOME      ?= /home/maxdnz/PeleLMeX
 PELE_PHYSICS_HOME  ?= ${TOP}/PelePhysics
 AMREX_HYDRO_HOME   ?= ${TOP}/AMReX-Hydro
 
 
 # AMReX
-DIM             = 3
+DIM             = 2
 DEBUG           = FALSE
 PRECISION       = DOUBLE
 VERBOSE         = FALSE
@@ -14,7 +14,7 @@ TINY_PROFILE    = FALSE
 
 # Compilation
 COMP            = gnu
-USE_MPI         = TRUE
+USE_MPI         = FALSE
 USE_OMP         = FALSE
 USE_CUDA        = FALSE
 USE_HIP         = FALSE
