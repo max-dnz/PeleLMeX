@@ -126,9 +126,9 @@ void pelelm_initdata(int i, int j, int k,
             Zst = (4.0/0.42)*dilution_vol;
             mtot = 16*prob_parm.ign_rich*dilution_vol + 28*(0.79*Zst+prob_parm.ign_rich*(1-dilution_vol)) + 32*0.21*Zst;
             
-            massfrac[O2_ID] = 0.0; //32*0.21*Zst/mtot;
-            massfrac[N2_ID] = 1.0; //28*(0.79*Zst+prob_parm.ign_rich*(1-dilution_vol))/mtot;
-            massfrac[CH4_ID] = 0.0; //16*prob_parm.ign_rich*dilution_vol/mtot;
+            massfrac[O2_ID] = 32*0.21*Zst/mtot; //21.9% pour richesse = 1
+            massfrac[N2_ID] = 28*(0.79*Zst+prob_parm.ign_rich*(1-dilution_vol))/mtot; //72.6% pour richesse = 1
+            massfrac[CH4_ID] = 16*prob_parm.ign_rich*dilution_vol/mtot; //5.5% pour richesse = 1
         }
     }
     

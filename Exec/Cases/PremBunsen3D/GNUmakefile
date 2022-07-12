@@ -1,13 +1,12 @@
-TOP = ../../../..
+TOP = /home/maxdnz/PeleLMeX/Submodules
 AMREX_HOME         ?= ${TOP}/amrex
-PELELMEX_HOME      ?= ${TOP}/PeleLMeX
+PELELMEX_HOME      ?= /home/maxdnz/PeleLMeX
 PELE_PHYSICS_HOME  ?= ${TOP}/PelePhysics
 AMREX_HYDRO_HOME   ?= ${TOP}/AMReX-Hydro
 
 
 # AMReX
-DIM             = 3
-DEBUG           = FALSE
+DIM             = 2
 PRECISION       = DOUBLE
 VERBOSE         = FALSE
 TINY_PROFILE    = FALSE

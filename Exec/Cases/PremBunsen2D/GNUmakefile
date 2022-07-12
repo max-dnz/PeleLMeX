@@ -14,7 +14,7 @@ TINY_PROFILE    = FALSE
 
 # Compilation
 COMP            = gnu
-USE_MPI         = FALSE
+USE_MPI         = TRUE
 USE_OMP         = FALSE
 USE_CUDA        = FALSE
 USE_HIP         = FALSE

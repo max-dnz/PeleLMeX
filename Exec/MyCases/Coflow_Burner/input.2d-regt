@@ -32,14 +32,14 @@ prob.ox_air_split = 0.005
 prob.ymax = 0.0009
 prob.V_fu = 0.389
 prob.V_ox = 0.462
-prob.T_fu = 510 
+prob.T_fu = 510
 prob.T_ox = 510
 prob.T_air = 300
 prob.dilution = 0.9
 
 prob.do_ignition = 1
-prob.ign_radius = 0.0006
-prob.ign_T = 1900
+prob.ign_radius = 0.002
+prob.ign_T = 1800
 prob.ign_rich = 1.0
 
 #-------------------------PeleLM CONTROL----------------------------
@@ -54,16 +54,18 @@ peleLM.advection_scheme = Godunov_BDS
 
 peleLM.fuel_name = CH4
 
-#amr.restart = chk00200
-#amr.regrid_on_restart = 1
-amr.check_int = 100
-amr.plot_int = 100
-amr.max_step = 3000
-amr.dt_shrink = 0.001
+amr.restart = chk02000
+amr.regrid_on_restart = 1
+amr.check_int = 200
+amr.plot_int = 1000
+amr.max_step = 10000
+amr.dt_shrink = 0.1
 #amr.stop_time = 1.1
 #amr.stop_time = 1.00
-amr.cfl = 0.2
+#amr.cfl = 0.035
+amr.cfl = 0.1
 amr.derive_plot_vars = avg_pressure mag_vort mass_fractions
+amr.grid_log            = grdlog       # name of grid logging file
 
 peleLM.chem_integrator = "ReactorCvode"
 peleLM.use_typ_vals_chem = 1          # Use species/temp typical values in CVODE
