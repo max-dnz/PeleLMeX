@@ -19,8 +19,11 @@ void pelelm_initdata(int i, int j, int k,
                      int is_incompressible,
                      amrex::Array4<amrex::Real> const& state,
                      amrex::Array4<amrex::Real> const& aux,
+<<<<<<< HEAD
                      amrex::Array4<amrex::Real> const& nE,
                      amrex::Array4<amrex::Real> const& phiV,
+=======
+>>>>>>> parent of 0bd4828... pb solving
                      amrex::GeometryData const& geomdata,
                      ProbParm const& prob_parm,
                      pele::physics::PMF::PmfData::DataContainer const * pmf_data)
@@ -108,7 +111,11 @@ void pelelm_initdata(int i, int j, int k,
     for (int n = 0; n < NUM_SPECIES; n++) {
        chargeDist += massfrac[n] * zk[n];
     }
+<<<<<<< HEAD
     nE(i,j,k) = std::max(1.0e-24,chargeDist/elemCharge);
+=======
+    state(i,j,k,NE) = std::max(1.0e-24,chargeDist/elemCharge);
+>>>>>>> parent of 0bd4828... pb solving
 
 
     AMREX_D_TERM(state(i,j,k,VELX) = 0.0;,
@@ -132,8 +139,13 @@ void pelelm_initdata(int i, int j, int k,
        state(i,j,k,FIRSTSPEC+n) = massfrac[n] * state(i,j,k,DENSITY);
     }
 
+<<<<<<< HEAD
     nE(i,j,k) *= state(i,j,k,DENSITY);
     phiV(i,j,k) = 0.0;
+=======
+    state(i,j,k,NE) *= state(i,j,k,DENSITY);
+    state(i,j,k,PHIV) = 0.0;
+>>>>>>> parent of 0bd4828... pb solving
 }
 
 AMREX_GPU_DEVICE
