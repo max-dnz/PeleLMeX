@@ -7,46 +7,19 @@
 
 #include <PeleLM_Index.H>
 #include <pelelm_prob_parm.H>
-<<<<<<< HEAD
-<<<<<<< HEAD
-#include <pmf.H>
-#include <pmf_data.H>
-=======
 #include <PMF.H>
 #include <PMFData.H>
->>>>>>> parent of 0bd4828... pb solving
-=======
-#include <PMF.H>
-#include <PMFData.H>
->>>>>>> ee45a90d4759a6c121d93e4c2f7e85720f79f22f
 #include <PelePhysics.H>
 
 AMREX_GPU_DEVICE
 AMREX_FORCE_INLINE
 void pelelm_initdata(int i, int j, int k,
-<<<<<<< HEAD
-<<<<<<< HEAD
-                     int is_incompressible,
-=======
-                     int /*is_incompressible*/,
->>>>>>> ee45a90d4759a6c121d93e4c2f7e85720f79f22f
-                     amrex::Array4<amrex::Real> const& state,
-                     amrex::Array4<amrex::Real> const& /*aux*/,
-                     amrex::GeometryData const& geomdata,
-                     ProbParm const& prob_parm,
-<<<<<<< HEAD
-                     PmfData const * pmf_data)
-=======
                      int /*is_incompressible*/,
                      amrex::Array4<amrex::Real> const& state,
                      amrex::Array4<amrex::Real> const& /*aux*/,
                      amrex::GeometryData const& geomdata,
                      ProbParm const& prob_parm,
                      pele::physics::PMF::PmfData::DataContainer const * pmf_data)
->>>>>>> parent of 0bd4828... pb solving
-=======
-                     pele::physics::PMF::PmfData::DataContainer const * pmf_data)
->>>>>>> ee45a90d4759a6c121d93e4c2f7e85720f79f22f
 {
     const amrex::Real* prob_lo = geomdata.ProbLo();
     const amrex::Real* prob_hi = geomdata.ProbHi();
@@ -83,15 +56,7 @@ void pelelm_initdata(int i, int j, int k,
     y1 = (y - prob_parm.standoff - 0.5*dx[1] + pert)*100;
     y2 = (y - prob_parm.standoff + 0.5*dx[1] + pert)*100;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-    PMF::pmf(pmf_data,y1, y2, pmf_vals);
-=======
     pele::physics::PMF::pmf(pmf_data,y1, y2, pmf_vals);
->>>>>>> parent of 0bd4828... pb solving
-=======
-    pele::physics::PMF::pmf(pmf_data,y1, y2, pmf_vals);
->>>>>>> ee45a90d4759a6c121d93e4c2f7e85720f79f22f
 
     state(i,j,k,TEMP) = pmf_vals[0];;
 
@@ -120,22 +85,10 @@ void pelelm_initdata(int i, int j, int k,
     for (int n = 0; n < NUM_SPECIES; n++) {
        state(i,j,k,FIRSTSPEC+n) = massfrac[n] * state(i,j,k,DENSITY);
     }
+    amrex::Real yc = 0.5 * (prob_hi[1] + prob_lo[1]) + pert;
+    state(i,j,k,NE) = 2.0e13 * std::exp(-(y-yc)*(y-yc)/(Ly*Ly/500.0));
+    state(i,j,k,PHIV) = 0.0;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-    amrex::Real yc = 0.5 * (prob_hi[1] + prob_lo[1]);
-    nE(i,j,k) = 2.0e13 * std::exp(-(y-yc)*(y-yc)/(Ly*Ly/100.0));
-    phiV(i,j,k) = 0.0;
-=======
-    amrex::Real yc = 0.5 * (prob_hi[1] + prob_lo[1]) + pert;
-    state(i,j,k,NE) = 2.0e13 * std::exp(-(y-yc)*(y-yc)/(Ly*Ly/500.0));
-    state(i,j,k,PHIV) = 0.0;
->>>>>>> parent of 0bd4828... pb solving
-=======
-    amrex::Real yc = 0.5 * (prob_hi[1] + prob_lo[1]) + pert;
-    state(i,j,k,NE) = 2.0e13 * std::exp(-(y-yc)*(y-yc)/(Ly*Ly/500.0));
-    state(i,j,k,PHIV) = 0.0;
->>>>>>> ee45a90d4759a6c121d93e4c2f7e85720f79f22f
 }
 
 AMREX_GPU_DEVICE
@@ -150,15 +103,7 @@ bcnormal(
   const amrex::Real time,
   amrex::GeometryData const& geomdata,
   ProbParm const& prob_parm,
-<<<<<<< HEAD
-<<<<<<< HEAD
-  PmfData const *pmf_data)
-=======
   pele::physics::PMF::PmfData::DataContainer const * pmf_data)
->>>>>>> parent of 0bd4828... pb solving
-=======
-  pele::physics::PMF::PmfData::DataContainer const * pmf_data)
->>>>>>> ee45a90d4759a6c121d93e4c2f7e85720f79f22f
 {
    const amrex::Real* prob_lo = geomdata.ProbLo();
    amrex::GpuArray<amrex::Real, NUM_SPECIES + 4> pmf_vals = {0.0};
@@ -167,15 +112,7 @@ bcnormal(
 
    auto eos = pele::physics::PhysicsType::eos();
    if (sgn == 1) {
-<<<<<<< HEAD
-<<<<<<< HEAD
-      PMF::pmf(pmf_data,prob_lo[idir], prob_lo[idir], pmf_vals);
-=======
       pele::physics::PMF::pmf(pmf_data,prob_lo[idir], prob_lo[idir], pmf_vals);
->>>>>>> parent of 0bd4828... pb solving
-=======
-      pele::physics::PMF::pmf(pmf_data,prob_lo[idir], prob_lo[idir], pmf_vals);
->>>>>>> ee45a90d4759a6c121d93e4c2f7e85720f79f22f
 
       AMREX_D_TERM(s_ext[VELX] = 0.0;,
                    s_ext[VELY] = pmf_vals[1]*1e-2;,

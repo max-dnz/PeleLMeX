@@ -14,15 +14,7 @@ peleLM.hi_bc = Interior Outflow
 #-------------------------AMR CONTROL----------------------------
 amr.n_cell          = 32 128 32      # Level 0 number of cells in each direction   
 amr.v               = 1                # AMR verbose
-<<<<<<< HEAD
-<<<<<<< HEAD
-amr.max_level       = 1                # maximum level number allowed
-=======
 amr.max_level       = 2                # maximum level number allowed
->>>>>>> parent of 0bd4828... pb solving
-=======
-amr.max_level       = 2                # maximum level number allowed
->>>>>>> ee45a90d4759a6c121d93e4c2f7e85720f79f22f
 amr.ref_ratio       = 2 2 2 2          # refinement ratio
 amr.regrid_int      = 5                # how often to regrid
 amr.n_error_buf     = 1 1 2 2          # number of buffer cells in error est
@@ -35,18 +27,10 @@ amr.max_grid_size   = 128               # max box size
 prob.P_mean = 101325.0
 prob.standoff = -.023
 prob.pertmag = 0.0000
-<<<<<<< HEAD
-<<<<<<< HEAD
-prob.pmf_datafile = "IonAir_pmf.dat"
+
+pmf.datafile = "IonAir_pmf.dat"
 prob.PhiV_y_hi = 10.0
-=======
-pmf.datafile = "IonAir_pmf.dat"
-prob.PhiV_y_hi = 100.0
->>>>>>> parent of 0bd4828... pb solving
-=======
-pmf.datafile = "IonAir_pmf.dat"
-prob.PhiV_y_hi = 100.0
->>>>>>> ee45a90d4759a6c121d93e4c2f7e85720f79f22f
+prob.PhiV_y_lo = 0.0
 
 #-------------------------PeleLM CONTROL----------------------------
 peleLM.v = 1
@@ -56,23 +40,6 @@ peleLM.mu = 0.0
 peleLM.use_wbar = 1
 peleLM.sdc_iterMax = 2
 peleLM.floor_species = 0
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-peleLM.num_init_iter = 3
->>>>>>> ee45a90d4759a6c121d93e4c2f7e85720f79f22f
-
-#amr.restart = chk00005
-#amr.check_int = 2000
-amr.plot_int = 2
-amr.max_step = 20
-amr.dt_shrink = 0.01
-amr.stop_time = 0.001
-#amr.stop_time = 1.00
-amr.cfl = 0.5
-<<<<<<< HEAD
-amr.derive_plot_vars = avg_pressure mag_vort mass_fractions
-=======
 peleLM.num_init_iter = 3
 
 #amr.restart = chk00005
@@ -84,35 +51,18 @@ amr.stop_time = 0.001
 #amr.stop_time = 1.00
 amr.cfl = 0.5
 amr.derive_plot_vars = avg_pressure mag_vort mass_fractions chargedistrib efieldy
->>>>>>> parent of 0bd4828... pb solving
-=======
-amr.derive_plot_vars = avg_pressure mag_vort mass_fractions chargedistrib efieldy
->>>>>>> ee45a90d4759a6c121d93e4c2f7e85720f79f22f
 
 cvode.solve_type = dense               # CVODE Linear solve type (for Newton direction) 
 ode.analytical_jacobian = 0            # Provide analytical jacobian (from Fuego) 
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-#--------------------REFINEMENT CONTROL------------------------
-=======
+
 #--------------------EFIELD CONTROL------------------------
->>>>>>> parent of 0bd4828... pb solving
-=======
-#--------------------EFIELD CONTROL------------------------
->>>>>>> ee45a90d4759a6c121d93e4c2f7e85720f79f22f
 ef.phiV_lo_bc = Interior Dirichlet
 ef.phiV_hi_bc = Interior Dirichlet
 ef.phiV_polarity_lo = Neutral Cathode
 ef.phiV_polarity_hi = Neutral Anode
-<<<<<<< HEAD
-<<<<<<< HEAD
-ef.GMRES_verbose  = 2
-ef.GMRES_rel_tol  = 1.0e-10
-=======
-=======
->>>>>>> ee45a90d4759a6c121d93e4c2f7e85720f79f22f
-ef.GMRES_rel_tol  = 1.0e-6
+
+ef.GMRES_rel_tol  = 1.0e-16
 ef.GMRES_abs_tol  = 1.0e-13
 ef.JFNK_lambda = 1.0e-7
 #ef.JFNK_diffType = 1 
@@ -131,10 +81,7 @@ ef.fixed_Ke = 0.4
 gmres.krylovBasis_size = 20
 gmres.verbose  = 0
 gmres.max_restart = 3 
-<<<<<<< HEAD
->>>>>>> parent of 0bd4828... pb solving
-=======
->>>>>>> ee45a90d4759a6c121d93e4c2f7e85720f79f22f
+
 
 #--------------------REFINEMENT CONTROL------------------------
 #amr.refinement_indicators = temp
@@ -152,18 +99,7 @@ amr.yE.max_level     = 3
 amr.yE.value_greater = 1.0e12
 amr.yE.field_name    = nE
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 amrex.fpe_trap_invalid = 1
 amrex.fpe_trap_zero = 1
 amrex.fpe_trap_overflow = 1
-=======
-#amrex.fpe_trap_invalid = 1
-#amrex.fpe_trap_zero = 1
-#amrex.fpe_trap_overflow = 1
->>>>>>> parent of 0bd4828... pb solving
-=======
-#amrex.fpe_trap_invalid = 1
-#amrex.fpe_trap_zero = 1
-#amrex.fpe_trap_overflow = 1
->>>>>>> ee45a90d4759a6c121d93e4c2f7e85720f79f22f
+
