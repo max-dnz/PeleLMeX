@@ -13,12 +13,12 @@
 #include <EOS_Extension.H>
 #include <PeleLMEF_Constants.H>
 
-AMREX_GPU_DEVICE
-AMREX_FORCE_INLINE
 
 // Find the zone of the cell to identify the inflow, initial conditions and BC
 // There are 4 zones : 1 = Fuel inflow ; 2 = Obstacle ; 3 = Oxidizer inflow ; 4 = Air inflow
-// Schema : 1 | 2 | 3 | 4
+// Schema : [ 1 | 2 | 3 | 4 ]
+AMREX_GPU_DEVICE
+AMREX_FORCE_INLINE
 int get_zone(const amrex::Real x, 
 	     amrex::GeometryData const& geomdata,
 	     ProbParm const& prob_parm)
@@ -52,12 +52,15 @@ int get_zone(const amrex::Real x,
    return zone;
 }
 
+AMREX_GPU_DEVICE
+AMREX_FORCE_INLINE
 void pelelm_initdata(int i, int j, int k,
                      int is_incompressible,
                      amrex::Array4<amrex::Real> const& state,
                      amrex::Array4<amrex::Real> const& aux,
                      amrex::GeometryData const& geomdata,
-                     ProbParm const& prob_parm)
+                     ProbParm const& prob_parm,
+                     pele::physics::PMF::PmfData::DataContainer const * pmf_data)
 {
     // Initialisation of some varibales for the cell, the geometry and the initial values
     const amrex::Real* prob_lo = geomdata.ProbLo();
@@ -70,9 +73,7 @@ void pelelm_initdata(int i, int j, int k,
 
     AMREX_D_TERM(const amrex::Real Lx = prob_hi[0] - prob_lo[0];,
                  const amrex::Real Ly = prob_hi[1] - prob_lo[1];,
-                 const amrex::Real Lz = prob_hi[2] - prob_lo[2]);
-
-    constexpr amrex::Real Pi = 3.14159265358979323846264338327950288;
+                 const amrex::Real Lz = prob_hi[2] - prob_lo[2];);
 
     auto eos = pele::physics::PhysicsType::eos();
     amrex::GpuArray<amrex::Real, NUM_SPECIES + 4> pmf_vals = {0.0};
@@ -83,23 +84,23 @@ void pelelm_initdata(int i, int j, int k,
     amrex::Real zk[NUM_SPECIES] = {0.0};
     
     // Set the pressure
-    amrex::Real P_cgs = prob_pram.P_mean*10.0;
+    amrex::Real P_cgs = prob_parm.P_mean*10.0; // Conversion to CGS
     
     // We set temp, velocity, mass fractions and electric density for all the domain; then density, enthalpy and mass.
     if (y >= prob_parm.Yin) // Zone outside the inflow for initial conditions (see geometry)
     {
     	// Mass fractions
     	molefrac[O2_ID] = 0.21;
-    	molefrac[N2_ID] = 0.79;    	
+    	molefrac[N2_ID] = 1 - molefrac[O2_ID];      	
     	eos.X2Y(molefrac,massfrac);
-    	mass_frac[E_ID] = 0.0;
+    	massfrac[E_ID] = 0.0;
     
     	// Temperature
     	state(i,j,k,TEMP) = prob_parm.T_air;
     	
     	// Velocity
-    	AMREX_D_TERM(state(i,j,k,VELX) = 0.0;
-    		     state(i,j,k,VELY) = prob_parm.V_air;
+    	AMREX_D_TERM(state(i,j,k,VELX) = 0.0;,
+    		     state(i,j,k,VELY) = prob_parm.V_air;,
     		     state(i,j,k,VELZ) = 0.0;);
     	
     	// nE : zk, Charge distribution
@@ -114,7 +115,7 @@ void pelelm_initdata(int i, int j, int k,
 	amrex::Real chargeDist = 0.0;
 	for (int n = 0; n < NUM_SPECIES; n++) 
 	{
-        chargeDist += massfrac[n] * zk[n];
+            chargeDist += massfrac[n] * zk[n];
     	}
     	/*
     	if ( chargeDist < 0.0 ) // Correction of errors
@@ -156,14 +157,14 @@ void pelelm_initdata(int i, int j, int k,
            // Mass fractions
     	   massfrac[CH4_ID] = prob_parm.dilution;
     	   massfrac[N2_ID] = 1 - massfrac[CH4_ID];    	
-    	   mass_frac[E_ID] = 0.0;
+    	   massfrac[E_ID] = 0.0;
     
       	   // Temperature
     	   state(i,j,k,TEMP) = prob_parm.T_fu;
     	
     	   // Velocity
-    	   AMREX_D_TERM(state(i,j,k,VELX) = 0.0;
-    		        state(i,j,k,VELY) = prob_parm.V_fu;
+    	   AMREX_D_TERM(state(i,j,k,VELX) = 0.0;,
+    		        state(i,j,k,VELY) = prob_parm.V_fu;,
     		        state(i,j,k,VELZ) = 0.0;);
     	
     	   // nE : zk, Charge distribution
@@ -178,26 +179,26 @@ void pelelm_initdata(int i, int j, int k,
 	   amrex::Real chargeDist = 0.0;
 	   for (int n = 0; n < NUM_SPECIES; n++) 
 	   {
-           chargeDist += massfrac[n] * zk[n];
+               chargeDist += massfrac[n] * zk[n];
     	   }
     	
     	   state(i,j,k,NE) = std::max(1.0e-24,chargeDist/elemCharge);
     	}
-    	
+    
     	else if ((zone == 2) or (zone == 3))
     	{
            // Mass fractions
     	   molefrac[O2_ID] = 0.21;
     	   molefrac[N2_ID] = 1 - molefrac[O2_ID];    	
     	   eos.X2Y(molefrac,massfrac);
-    	   mass_frac[E_ID] = 0.0;
+    	   massfrac[E_ID] = 0.0;
     
       	   // Temperature
     	   state(i,j,k,TEMP) = prob_parm.T_ox;
     	
     	   // Velocity
-    	   AMREX_D_TERM(state(i,j,k,VELX) = 0.0;
-    		        state(i,j,k,VELY) = prob_parm.V_ox;
+    	   AMREX_D_TERM(state(i,j,k,VELX) = 0.0;,
+    		        state(i,j,k,VELY) = prob_parm.V_ox;,
     		        state(i,j,k,VELZ) = 0.0;);
     	
     	   // nE : zk, Charge distribution
@@ -212,7 +213,7 @@ void pelelm_initdata(int i, int j, int k,
 	   amrex::Real chargeDist = 0.0;
 	   for (int n = 0; n < NUM_SPECIES; n++) 
 	   {
-           chargeDist += massfrac[n] * zk[n];
+               chargeDist += massfrac[n] * zk[n];
     	   }
     	
     	   state(i,j,k,NE) = std::max(1.0e-24,chargeDist/elemCharge);
@@ -224,14 +225,14 @@ void pelelm_initdata(int i, int j, int k,
     	   molefrac[O2_ID] = 0.21;
     	   molefrac[N2_ID] = 1 - molefrac[O2_ID];    	
     	   eos.X2Y(molefrac,massfrac);
-    	   mass_frac[E_ID] = 0.0;
+    	   massfrac[E_ID] = 0.0;
     
       	   // Temperature
     	   state(i,j,k,TEMP) = prob_parm.T_air;
     	
     	   // Velocity
-    	   AMREX_D_TERM(state(i,j,k,VELX) = 0.0;
-    		        state(i,j,k,VELY) = prob_parm.V_air;
+    	   AMREX_D_TERM(state(i,j,k,VELX) = 0.0;,
+    		        state(i,j,k,VELY) = prob_parm.V_air;,
     		        state(i,j,k,VELZ) = 0.0;);
     	
     	   // nE : zk, Charge distribution
@@ -246,14 +247,15 @@ void pelelm_initdata(int i, int j, int k,
 	   amrex::Real chargeDist = 0.0;
 	   for (int n = 0; n < NUM_SPECIES; n++) 
 	   {
-           chargeDist += massfrac[n] * zk[n];
+               chargeDist += massfrac[n] * zk[n];
     	   }
     	
     	   state(i,j,k,NE) = std::max(1.0e-24,chargeDist/elemCharge);
     	}
-    	
+    } 
+       	
     // Ignition zone for the flame - This zone is set to the stoechimetry for the methane combustion - The temperature profile inside the blob is hyperbolic
-    if (do_ignition)
+    if (prob_parm.do_ignition == 1)
     {
 	amrex::Real xc = prob_parm.Xf;
 	amrex::Real yc = prob_parm.Yin;
@@ -283,7 +285,8 @@ void pelelm_initdata(int i, int j, int k,
     state(i,j,k,RHOH) = h_cgs * 1.0e-4 * state(i,j,k,DENSITY);
 
     // Species mass
-    for (int n = 0; n < NUM_SPECIES; n++) {
+    for (int n = 0; n < NUM_SPECIES; n++) 
+    {
        state(i,j,k,FIRSTSPEC+n) = massfrac[n] * state(i,j,k,DENSITY);
     }
 
@@ -292,19 +295,19 @@ void pelelm_initdata(int i, int j, int k,
 }
 
 
-// FAIRE PROFIL HYPERBOLIQUE (DE VITESSE ?) POUR LE INFLOW (FUEL ET OXIDIZER)
+// Set the BC for inflows
 AMREX_GPU_DEVICE
 AMREX_FORCE_INLINE
 void
-bcnormal(
-  const amrex::Real *x[AMREX_SPACEDIM],
-  const int m_nAux,
-  amrex::Real s_ext[NVAR],
-  const int idir,
-  const int sgn,
-  const amrex::Real time,
-  amrex::GeometryData const& geomdata,
-  ProbParm const& prob_parm)
+bcnormal( const amrex::Real x[AMREX_SPACEDIM],
+	  const int m_nAux,
+	  amrex::Real s_ext[NVAR],
+	  const int idir,
+	  const int sgn,
+	  const amrex::Real time,
+	  amrex::GeometryData const& geomdata,
+	  ProbParm const& prob_parm,
+	  pele::physics::PMF::PmfData::DataContainer const * pmf_data)
 {
    const amrex::Real* prob_lo = geomdata.ProbLo();
    
@@ -319,54 +322,71 @@ bcnormal(
    {
       s_ext[n] = 0.0;
    }
-
-   const amrex::Real* prob_lo = geomdata.ProbLo();
-   const amrex::Real* prob_hi = geomdata.ProbHi();
-
-   AMREX_D_TERM(const amrex::Real Lx = prob_hi[0] - prob_lo[0];,
-                const amrex::Real Ly = prob_hi[1] - prob_lo[1];,
-                const amrex::Real Lz = prob_hi[2] - prob_lo[2]);
    
-   
-   // BC Inflow (idir = 1 and sgn = 1 always)
+   // BC Inflow (idir = 1 and sgn = 1 always as inflow BC is set at the bottom of the calculation zone)
    if ((idir == 1) && (sgn == 1))
    {
-   	s_ext[VELX] = 0.0
-   	s_ext[VELZ] = 0.0
-   	P_cgs = prob_parm.P_mean * 10.0
+   	s_ext[VELX] = 0.0;
+   	s_ext[VELZ] = 0.0;
+   	P_cgs = prob_parm.P_mean * 10.0; //CGS->MKS conversion
    	
    	int zone = get_zone(x[0], geomdata, prob_parm);
    	
+   	amrex::Real a = 0;
+   	amrex::Real c = 0;
+   	amrex::Real eta = 1;
+   	amrex::Real delta = 5e-5;
+   	
    	switch (zone)
    	{
-   	   case 1:
-   	      s_ext[VELY] = prob_parm.V_fu;
+   	   case 1: // Fuel inflow
+   	   {   
+   	      // The speed in the fuel inflow has a parabolic profile - the fuel tube is supposed ideal and the speed is set at 0 at the limits of the tube. 
+   	      a = (-1.5)*prob_parm.V_fu/(prob_parm.Xf*prob_parm.Xf);
+   	      c = 1.5*prob_parm.V_fu;
+   	      s_ext[VELY] = a*x[0]*x[0] + c;
+   	      
+   	      // Temperature and mass fractions are set as uniform
    	      s_ext[TEMP] = prob_parm.T_fu;
    	      massfrac[CH4_ID] = prob_parm.dilution;
    	      massfrac[N2_ID] = 1 - massfrac[CH4_ID];
-   	      break;
+   	   }
+   	   break;
    
-   	   case 2:
+   	   case 2: // Obstacle
+   	   { 
+   	      // Speed, Temperature and mass fractions are set as uniforms
    	      s_ext[VELY] = 0.0;
    	      s_ext[TEMP] = prob_parm.T_obst;
    	      massfrac[N2_ID] = 1.0;
-   	      break;
+   	   }
+   	   break;
    
-   	   case 3:
-   	      s_ext[VELY] = prob_parm.V_ox;
+   	   case 3: // Oxidizer inflow
+   	   {
+   	      // The speed in tha oxidizer inflow has an hyperbolic profile. This is due to the boundary layer of the extruded tube a=in the real experiment. 
+   	      delta = 5e-5;
+   	      eta = tanh((x[0]-prob_parm.Xf-prob_parm.Xe)/delta);
+   	      s_ext[VELY] = eta*prob_parm.V_ox;
+   	      
+   	      // Temperature and mass fractions are set as uniform
    	      s_ext[TEMP] = prob_parm.T_ox;
    	      molefrac[O2_ID] = 0.21; 
    	      molefrac[N2_ID] = 1 - molefrac[O2_ID];
    	      eos.X2Y(molefrac,massfrac);
-   	      break;
+   	   }
+   	   break;
    	      
-   	   case 4:
+   	   case 4: // Air around
+   	   {   
+   	      // Speed, Temperature and mass fractions are set as uniforms
    	      s_ext[VELY] = prob_parm.V_air;
    	      s_ext[TEMP] = prob_parm.T_air;
    	      molefrac[O2_ID] = 0.21;
    	      molefrac[N2_ID] = 1 - molefrac[O2_ID];
    	      eos.X2Y(molefrac,massfrac);
-   	      break;
+   	   } 
+   	   break;
    	      
    	   default:
    	      break;  
@@ -397,7 +417,7 @@ bcnormal(
          s_ext[NE] = 0.0;
          s_ext[PHIV] = prob_parm.phiV_hiy;
       }   
-   }
+   }  
 }
 
 AMREX_GPU_DEVICE
@@ -413,7 +433,6 @@ zero_visc (int i, int j, int k,
 {
      amrex::ignore_unused(i,j,k,beta,geomdata,domainBox,dir,beta_comp,nComp);
     
-    
     // We treat species when beta_comp == 0 and nComp == NUM_SPECIES
     // otherwise this routine could be called for other face diffusivity (Temp, velocity, ...)
     if ((beta_comp == 0) && (nComp == NUM_SPECIES))
@@ -425,7 +444,7 @@ zero_visc (int i, int j, int k,
 	    const amrex::Real* dx      = geomdata.CellSize();
 	    const amrex::Real x = prob_lo[0] + (i+0.5)*dx[0];
 	    
-	    if (get_zone(x,geomdata,prob_parm) == 2)
+	    if ((x > 0.0011) and (x < 0.0012)) // Hard coded size of the burner lip (we can't use void get_zone as Prob_parm is not called in this function
 	    {
 	    	for (int n = beta_comp; n < beta_comp + nComp; n++) 
 	    	{

@@ -1,12 +1,12 @@
 #----------------------DOMAIN DEFINITION------------------------
-prob.Xmax = 0.015 #Maximum size in the x direction
+prob.Xmax = 0.0185 #Maximum size in the x direction
 prob.Ymax = 0.037 #Maximum size in the y direction
-prob.Zmax = 0.015 #Maximum size in the z direction
+prob.Zmax = 0.0185 #Maximum size in the z direction
 
-geometry.is_periodic = 0 0 0                                # For each dir, 0: non-perio, 1: periodic
-geometry.coord_sys   = 0                                    # 0 => cart, 1 => RZ
-geometry.prob_lo     = 0.0 0.0 0.0                          # x_lo y_lo (z_lo)
-geometry.prob_hi     = prob.Xmax prob.Ymax prob.Zmax        # x_hi y_hi (z_hi)
+geometry.is_periodic = 0 0                          # For each dir, 0: non-perio, 1: periodic
+geometry.coord_sys   = 0                              # 0 => cart, 1 => RZ
+geometry.prob_lo     = 0.0 0.0                   # x_lo y_lo (z_lo)
+geometry.prob_hi     = 0.0185 0.037             # x_hi y_hi (z_hi)
 
 # >>>>>>>>>>>>>  BC FLAGS <<<<<<<<<<<<<<<<
 # Interior, Inflow, Outflow, Symmetry,
@@ -16,7 +16,7 @@ peleLM.hi_bc = SlipWallAdiab Outflow
 
 
 #-------------------------AMR CONTROL----------------------------
-amr.n_cell          = 64 128 32      # Level 0 number of cells in each direction   
+amr.n_cell          = 64 128 32        # Level 0 number of cells in each direction   
 amr.v               = 1                # AMR verbose
 amr.max_level       = 2                # maximum level number allowed
 amr.ref_ratio       = 2 2 2 2          # refinement ratio
@@ -24,58 +24,57 @@ amr.regrid_int      = 2                # how often to regrid
 amr.n_error_buf     = 2 4 2 2          # number of buffer cells in error est
 amr.grid_eff        = 0.7              # what constitutes an efficient grid
 amr.blocking_factor = 16               # block factor in grid generation (min box size)
-amr.max_grid_size   = 128               # max box size
+amr.max_grid_size   = 128              # max box size
 
 
 #--------------------------- Problem -------------------------------
-prob.standoff = -.01
-prob.pertmag = 0.0001
+prob.Xf = 0.0011    # Radius of the fuel pipe
+prob.Xe = 0.0001    # Thickness of the extruded tube
+prob.Xc = 0.0113    # Size of the oxidizer fuel
 
-prob.Xf = 0.0011    #Radius of the fuel pipe
-prob.Xe = 0.0001    #Thickness of the extruded tube
-prob.Xc = 0.0113    #Size of the oxidizer fuel
+prob.Yin = 0.004  # Height of the inflow entrance at t=0s
+prob.V_fu = 0.15  # Speed of the fuel in inflow
+prob.V_ox = 0.031 # Speed of the oxidizer in inflow
+prob.V_air = 0.0  # Speed of the air flow around the burner
+prob.T_fu = 300   # Temperature of the fuel
+prob.T_ox = 300   # Temperature of the oxidizer
+prob.T_air = 300  # Temperature of the air
+prob.T_obst = 450 # Temperature of the fuel pipe (=obstacle)
 
-prob.Yin = 0.004  #Height of the inflow entrance at t=0s
-prob.V_fu = 0.015 #Speed of the fuel in inflow
-prob.V_ox = 0.0   #Speed of the oxidizer in inflow
-prob.T_fu = 300   #Temperature of the fuel
-prob.T_ox = 300   #Temperature of the oxidizer
-prob.T_air = 300  #Temperature of the air
-prob.T_obst = 300 #Temperature of the fuel pipe (=obstacle)
+prob.do_ignition = 1    # Do you want to do ignition ?
+prob.ign_rad = 0.001    # Size of the ignition blob
+prob.ign_T = 1800       # Temperature inside the ignition blob
 
-prob.do_ignition = TRUE #Do you want to do ignition ?
-prob.ign_rad = 0.001    #Size of the ignition blob
-prob.ign_T = 1800       #Temperature inside the ignition blob
+prob.P_mean = 100000.0 # Ambient pressure in the chamber
 
-prob.P_mean = 101325.0 #Ambient pressure in the chamber
+prob.dilution = 1.0 # Proportion of CH4 in the fuel mix. Ch4 is diluted in N2
 
-prob.dilution = 1.0 #Proportion of CH4 in the fuel mix. Ch4 is diluted in N2
+prob.PhiV_y_hi = 0.0     # The electric potential at the top electrode
+#prob.PhiV_y_hi = 3700.0 # The electric potential at the top electrode
+pron.PhiV_y_lo = 0.0     # The electric potential at the bottom electrode
 
-prob.PhiV_y_hi = 1000.0 #The electric potential at the top electrode
-pron.PhiV_y_lo = 0.0    #The electric potential at the bottom electrode
-
-#pmf.datafile = "pmf_CH4Air_1p0.dat"
-#pmf.do_cellAverage = 0
+prob.PhiV_x_hi = 0.0     # The electric potential at the left side
+pron.PhiV_x_lo = 0.0     # The electric potential at the right side
 #-------------------------PeleLM CONTROL----------------------------
 peleLM.gravity = 0.0 -9.81 0.0
 
-peleLM.v = 2
+peleLM.v = 1
 peleLM.incompressible = 0
 peleLM.rho = 1.17
 peleLM.mu = 0.0
 peleLM.use_wbar = 1
-peleLM.sdc_iterMax = 2
+peleLM.sdc_iterMax = 1
 peleLM.floor_species = 0
 peleLM.num_init_iter = 2
 peleLM.advection_scheme = "Godunov_BDS"
 
 #amr.restart = chk00070
-amr.check_int = 20
-amr.plot_int = 10
-amr.max_step = 20
+amr.check_int = 500
+amr.plot_int = 20
+amr.max_step = 100
 amr.dt_shrink = 0.1
-amr.stop_time = 0.001
-amr.cfl = 0.95
+#amr.stop_time = 0.001
+amr.cfl = 0.05
 amr.derive_plot_vars = avg_pressure mag_vort mass_fractions chargedistrib efieldx efieldy LorentzFx LorentzFy 
 
 peleLM.chem_integrator = "ReactorCvode"
@@ -86,8 +85,8 @@ cvode.solve_type = denseAJ_direct     # CVODE Linear solve type (for Newton dire
 cvode.max_order  = 4                  # CVODE max BDF order. 
 
 #--------------------REFINEMENT CONTROL------------------------
-ef.phiV_lo_bc = Interior Dirichlet  #TO SOLVE ###################################################
-ef.phiV_hi_bc = Interior Dirichlet
+ef.phiV_lo_bc = Neumann Dirichlet
+ef.phiV_hi_bc = Neumann Dirichlet
 ef.phiV_polarity_lo = Neutral Cathode
 ef.phiV_polarity_hi = Neutral Anode
 

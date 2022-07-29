@@ -7,8 +7,6 @@ using namespace amrex::literals;
 
 struct ProbParm
 {  
-   amrex::Real standoff = 0.0_rt;
-   amrex::Real pertmag  = 0.0004_rt;
    
    //Definition of the geometry (in meters)
    amrex::Real Xmax = 0.015; //Maximum size in x direction of the calcuation zone
@@ -21,19 +19,20 @@ struct ProbParm
    //Definition of the inflow conditions
    amrex::Real Yin = 0.004; //Height of the inflow entrance at t=0s
    
-   amrex::Real V_fu = 0.015; //Speed of the fuel in inflow (m/s)
-   amrex::Real V_ox = 0.0; //Speed of the oxidizer in inflow
+   amrex::Real V_fu = 0.15; //Speed of the fuel in inflow (m/s)
+   amrex::Real V_ox = 0.031; //Speed of the oxidizer in inflow
+   amrex::Real V_air = 0.0; //Speed of the air flow around the burner
    
    amrex::Real T_fu = 300; //Temperature of the fuel (in Kelvin)
    amrex::Real T_ox = 300; //Temperature of the oxidizer
    amrex::Real T_air = 300; //Temperature of the air
-   amrex::Real T_obst = 300; //Temperature of the fuel pipe (=obstacle)
+   amrex::Real T_obst = 450; //Temperature of the fuel pipe (=obstacle)
    
    //Definition of the initial conditions
-   amrex::Real P_mean   = 101325.0_rt; //Ambient pressure in the chamber
+   amrex::Real P_mean   = 100000.0_rt; //Ambient pressure in the chamber
   
    //Definition of the ignition zone
-   bool do_ignition = TRUE; //Do you want to do ignition ?
+   int do_ignition = 1; //Do you want to do ignition ?
    amrex::Real ign_rad = 0.001; //Size of the ignition blob
    int ign_T = 1800; //Temperature inside the ignition blob (in Kelvin)
    

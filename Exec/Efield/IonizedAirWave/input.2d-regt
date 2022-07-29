@@ -13,7 +13,7 @@ peleLM.hi_bc = Interior Outflow
 
 #-------------------------AMR CONTROL----------------------------
 amr.n_cell          = 32 128 32      # Level 0 number of cells in each direction   
-amr.v               = 1                # AMR verbose
+amr.v               = 0                # AMR verbose
 amr.max_level       = 2                # maximum level number allowed
 amr.ref_ratio       = 2 2 2 2          # refinement ratio
 amr.regrid_int      = 5                # how often to regrid
@@ -38,19 +38,19 @@ peleLM.incompressible = 0
 peleLM.rho = 1.17
 peleLM.mu = 0.0
 peleLM.use_wbar = 1
-peleLM.sdc_iterMax = 2
+peleLM.sdc_iterMax = 1
 peleLM.floor_species = 0
 peleLM.num_init_iter = 3
 
 #amr.restart = chk00005
-#amr.check_int = 2000
-amr.plot_int = 2
-amr.max_step = 20
+amr.check_int = 500
+amr.plot_int = 100
+amr.max_step = 1000
 amr.dt_shrink = 0.01
-amr.stop_time = 0.001
+#amr.stop_time = 0.001
 #amr.stop_time = 1.00
 amr.cfl = 0.5
-amr.derive_plot_vars = avg_pressure mag_vort mass_fractions chargedistrib efieldy
+amr.derive_plot_vars = ioncurrent
 
 cvode.solve_type = dense               # CVODE Linear solve type (for Newton direction) 
 ode.analytical_jacobian = 0            # Provide analytical jacobian (from Fuego) 
