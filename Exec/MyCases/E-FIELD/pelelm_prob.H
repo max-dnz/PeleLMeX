@@ -10,8 +10,11 @@
 #include <PMF.H>
 #include <PMFData.H>
 #include <PelePhysics.H>
+
+#ifdef PELE_USE_EFIELD
 #include <EOS_Extension.H>
 #include <PeleLMEF_Constants.H>
+#endif
 
 
 // Find the zone of the cell to identify the inflow, initial conditions and BC
@@ -80,8 +83,11 @@ void pelelm_initdata(int i, int j, int k,
     
     amrex::Real molefrac[NUM_SPECIES] = {0.0};
     amrex::Real massfrac[NUM_SPECIES] = {0.0};
+    
+    #ifdef PELE_USE_EFIELD
     amrex::Real mw[NUM_SPECIES] = {0.0};
     amrex::Real zk[NUM_SPECIES] = {0.0};
+    #endif
     
     // Set the pressure
     amrex::Real P_cgs = prob_parm.P_mean*10.0; // Conversion to CGS
@@ -103,6 +109,7 @@ void pelelm_initdata(int i, int j, int k,
     		     state(i,j,k,VELY) = prob_parm.V_air;,
     		     state(i,j,k,VELZ) = 0.0;);
     	
+    	#ifdef PELE_USE_EFIELD
     	// nE : zk, Charge distribution
     	eos.molecular_weight(mw);
     	pele::physics::eos::charge_mass(zk);
@@ -147,6 +154,7 @@ void pelelm_initdata(int i, int j, int k,
         }
         */
         state(i,j,k,NE) = std::max(1.0e-24,chargeDist/elemCharge);
+        #endif
     }       
     else
     {
@@ -166,7 +174,8 @@ void pelelm_initdata(int i, int j, int k,
     	   AMREX_D_TERM(state(i,j,k,VELX) = 0.0;,
     		        state(i,j,k,VELY) = prob_parm.V_fu;,
     		        state(i,j,k,VELZ) = 0.0;);
-    	
+    	   
+    	   #ifdef PELE_USE_EFIELD
     	   // nE : zk, Charge distribution
     	   eos.molecular_weight(mw);
     	   pele::physics::eos::charge_mass(zk);
@@ -183,6 +192,7 @@ void pelelm_initdata(int i, int j, int k,
     	   }
     	
     	   state(i,j,k,NE) = std::max(1.0e-24,chargeDist/elemCharge);
+    	   #endif
     	}
     
     	else if ((zone == 2) or (zone == 3))
@@ -200,7 +210,8 @@ void pelelm_initdata(int i, int j, int k,
     	   AMREX_D_TERM(state(i,j,k,VELX) = 0.0;,
     		        state(i,j,k,VELY) = prob_parm.V_ox;,
     		        state(i,j,k,VELZ) = 0.0;);
-    	
+    	   
+    	   #ifdef PELE_USE_EFIELD
     	   // nE : zk, Charge distribution
     	   eos.molecular_weight(mw);
     	   pele::physics::eos::charge_mass(zk);
@@ -217,6 +228,7 @@ void pelelm_initdata(int i, int j, int k,
     	   }
     	
     	   state(i,j,k,NE) = std::max(1.0e-24,chargeDist/elemCharge);
+    	   #endif
     	}
     	
     	else // zone = 4
@@ -234,7 +246,8 @@ void pelelm_initdata(int i, int j, int k,
     	   AMREX_D_TERM(state(i,j,k,VELX) = 0.0;,
     		        state(i,j,k,VELY) = prob_parm.V_air;,
     		        state(i,j,k,VELZ) = 0.0;);
-    	
+    	   
+    	   #ifdef PELE_USE_EFIELD
     	   // nE : zk, Charge distribution
     	   eos.molecular_weight(mw);
     	   pele::physics::eos::charge_mass(zk);
@@ -251,6 +264,7 @@ void pelelm_initdata(int i, int j, int k,
     	   }
     	
     	   state(i,j,k,NE) = std::max(1.0e-24,chargeDist/elemCharge);
+    	   #endif
     	}
     } 
        	
@@ -289,9 +303,11 @@ void pelelm_initdata(int i, int j, int k,
     {
        state(i,j,k,FIRSTSPEC+n) = massfrac[n] * state(i,j,k,DENSITY);
     }
-
+    
+    #ifdef PELE_USE_EFIELD
     state(i,j,k,NE) *= state(i,j,k,DENSITY);
     state(i,j,k,PHIV) = 0.0;
+    #endif
 }
 
 
@@ -403,7 +419,8 @@ bcnormal( const amrex::Real x[AMREX_SPACEDIM],
          s_ext[FIRSTSPEC+n] = massfrac[n] * s_ext[DENSITY];
       }
    } 
-
+   
+   #ifdef PELE_USE_EFIELD
    // BC Efield
    if (idir == 1) // y-dir
    {  
@@ -417,7 +434,8 @@ bcnormal( const amrex::Real x[AMREX_SPACEDIM],
          s_ext[NE] = 0.0;
          s_ext[PHIV] = prob_parm.phiV_hiy;
       }   
-   }  
+   }
+   #endif  
 }
 
 AMREX_GPU_DEVICE

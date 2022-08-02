@@ -20,7 +20,7 @@ USE_CUDA        = FALSE
 USE_HIP         = FALSE
 
 # PeleLMeX
-USE_EFIELD      = TRUE
+USE_EFIELD      = FALSE
 
 # PelePhysics
 Chemistry_Model = methaneIons_diRenzo
