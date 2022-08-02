@@ -67,8 +67,9 @@ peleLM.sdc_iterMax = 1
 peleLM.floor_species = 0
 peleLM.num_init_iter = 2
 peleLM.advection_scheme = "Godunov_PLM"
+peleLM.do_temporals = 1 # use to calculate the inetgrals
 
-#mr.restart = chk01000
+amr.restart = chk01000
 amr.check_int = 1000
 amr.plot_int = 500
 amr.max_step = 15000
@@ -92,6 +93,8 @@ ef.phiV_polarity_hi = Neutral Anode
 
 ef.restart_nonEF = 0  #If 1, restart the simulation from the last data but allow to cahnge some parameters like the BC but not the initial condition
 
+ef.plot_extras = 1  #plot all the variables for efield
+ef.do_ionsBalance = 1
 ef.GMRES_rel_tol  = 1.0e-5
 ef.GMRES_abs_tol  = 1.0e-13
 ef.JFNK_lambda = 1.0e-7
