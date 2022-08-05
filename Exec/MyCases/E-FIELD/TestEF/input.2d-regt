@@ -18,7 +18,7 @@ peleLM.hi_bc = SlipWallAdiab Outflow
 #-------------------------AMR CONTROL----------------------------
 amr.n_cell          = 128 256 32        # Level 0 number of cells in each direction   
 amr.v               = 1                # AMR verbose
-amr.max_level       = 0                # maximum level number allowed
+amr.max_level       = 2                # maximum level number allowed
 amr.ref_ratio       = 2 2 2 2          # refinement ratio
 amr.regrid_int      = 2                # how often to regrid
 amr.n_error_buf     = 2 2 2 2          # number of buffer cells in error est
@@ -55,8 +55,7 @@ pron.PhiV_y_lo = 0.0     # The electric potential at the bottom electrode
 prob.PhiV_x_hi = 0.0     # The electric potential at the left side
 pron.PhiV_x_lo = 0.0     # The electric potential at the right side
 #-------------------------PeleLM CONTROL----------------------------
-#peleLM.gravity = 0.0 -9.81 0.0
-peleLM.gravity = 0.0 0.0 0.0
+peleLM.gravity = 0.0 -9.81 0.0
 
 peleLM.v = 2
 peleLM.incompressible = 0
@@ -71,11 +70,11 @@ peleLM.do_temporals = 1 # use to calculate the integrals
 
 #amr.restart = chk01000
 amr.check_int = 1000
-amr.plot_int = 100
+amr.plot_int = 50
 amr.max_step = 1000
 amr.dt_shrink = 0.2
 #amr.stop_time = 0.001
-amr.cfl = 0.05
+amr.cfl = 0.01
 amr.derive_plot_vars = avg_pressure mag_vort mass_fractions chargedistrib efieldx efieldy LorentzFx LorentzFy 
 
 peleLM.chem_integrator = "ReactorCvode"
@@ -91,7 +90,7 @@ ef.phiV_hi_bc = Dirichlet Dirichlet
 ef.phiV_polarity_lo = Neutral Cathode
 ef.phiV_polarity_hi = Neutral Anode
 
-ef.restart_nonEF = 0  #If 1, restart the simulation from the last data but allow to change some parameters like the BC but not the initial condition
+ef.restart_nonEF = 0  #If 1, restart the simulation from the last data but allow to cahnge some parameters like the BC but not the initial condition
 
 ef.plot_extras = 1  #plot all the variables for efield
 ef.do_ionsBalance = 1

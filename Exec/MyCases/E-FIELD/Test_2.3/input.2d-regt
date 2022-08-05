@@ -75,7 +75,7 @@ amr.plot_int = 100
 amr.max_step = 1000
 amr.dt_shrink = 0.2
 #amr.stop_time = 0.001
-amr.cfl = 0.05
+amr.cfl = 0.03
 amr.derive_plot_vars = avg_pressure mag_vort mass_fractions chargedistrib efieldx efieldy LorentzFx LorentzFy 
 
 peleLM.chem_integrator = "ReactorCvode"
