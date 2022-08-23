@@ -124,7 +124,6 @@ void PeleLM::Setup() {
    prob_parm = new ProbParm{};
    prob_parm_d = (ProbParm*)The_Arena()->alloc(sizeof(ProbParm));
 
-
    // Problem parameters
    readProbParm();
 
@@ -401,6 +400,7 @@ void PeleLM::readParameters() {
    ppa.query("dt_shrink", m_dtshrink);
    ppa.query("dt_change_max", m_dtChangeMax);
    ppa.query("max_dt", m_max_dt);
+   ppa.query("min_dt", m_min_dt);
 
    if ( max_level > 0 ) {
       ppa.query("regrid_int", m_regrid_int);
@@ -498,6 +498,7 @@ void PeleLM::readIOParameters() {
    pp.query("check_int" , m_check_int);
    pp.query("restart" , m_restart_chkfile);
    pp.query("initDataPlt" , m_restart_pltfile);
+   pp.query("initDataPltSource" , pltfileSource);
    pp.query("plot_file", m_plot_file);
    pp.query("plot_int" , m_plot_int);
    if (pp.contains("plot_per")) {
@@ -523,6 +524,7 @@ void PeleLM::readIOParameters() {
    pp.query("initial_grid_file", m_initial_grid_file);
    pp.query("regrid_file", m_regrid_file);
    pp.query("file_stepDigits", m_ioDigits);
+   pp.query("use_hdf5_plt",m_write_hdf5_pltfile);
 
 }
 

@@ -35,8 +35,16 @@ void PeleLM::WriteDebugPlotFile(const Vector<const MultiFab*> &a_MF,
       names[n] = "comp"+std::to_string(n);
    }
    Vector<int> istep(finest_level + 1, m_nstep);
-   amrex::WriteMultiLevelPlotfile(pltname, finest_level + 1, a_MF,
-                                  names, Geom(), m_cur_time, istep, refRatio());
+#ifdef AMREX_USE_HDF5
+   if (m_write_hdf5_pltfile) {
+       amrex::WriteMultiLevelPlotfileHDF5(pltname, finest_level + 1, a_MF,
+                                          names, Geom(), m_cur_time, istep, refRatio());
+   } else
+#endif
+   {
+       amrex::WriteMultiLevelPlotfile(pltname, finest_level + 1, a_MF,
+                                      names, Geom(), m_cur_time, istep, refRatio());
+   }
 }
 
 void PeleLM::WritePlotFile() {
@@ -297,8 +305,16 @@ void PeleLM::WritePlotFile() {
    // No SubCycling, all levels the same step.
    Vector<int> istep(finest_level + 1, m_nstep);
 
-   amrex::WriteMultiLevelPlotfile(plotfilename, finest_level + 1, GetVecOfConstPtrs(mf_plt),
-                                  plt_VarsName, Geom(), m_cur_time, istep, refRatio());
+#ifdef AMREX_USE_HDF5
+   if (m_write_hdf5_pltfile) {
+       amrex::WriteMultiLevelPlotfileHDF5(plotfilename, finest_level + 1, GetVecOfConstPtrs(mf_plt),
+                                          plt_VarsName, Geom(), m_cur_time, istep, refRatio());
+   } else
+#endif
+   {
+       amrex::WriteMultiLevelPlotfile(plotfilename, finest_level + 1, GetVecOfConstPtrs(mf_plt),
+                                      plt_VarsName, Geom(), m_cur_time, istep, refRatio());
+   }
 
 #ifdef PELELM_USE_SPRAY
    if (theSprayPC() != nullptr && do_spray_particles) {
@@ -338,9 +354,13 @@ void PeleLM::WriteHeader(const std::string& name, bool is_checkpoint) const
         }
 
         HeaderFile << finest_level << "\n";
-
-        // Time stepping controls
+        
         HeaderFile << m_nstep << "\n";
+
+#ifdef AMREX_USE_EB
+        HeaderFile << m_EB_generate_max_level << "\n";
+#endif
+
         HeaderFile << m_cur_time << "\n";
         HeaderFile << m_dt << "\n";
         HeaderFile << m_prev_dt << "\n";
@@ -462,9 +482,26 @@ void PeleLM::ReadCheckPointFile()
    is >> m_nstep;
    GotoNextLine(is);
 
+#ifdef AMREX_USE_EB
+   // Finest level at which EB was generated
+   // actually used independently, so just skip ...
+   std::getline(is, line);
+
+   // ... but to be backward compatible, if we get a float,
+   // let's assume it's m_cur_time
+   if (line.find('.') != std::string::npos) {
+      m_cur_time = std::stod(line);
+   } else {
+      // Skip line and read current time
+      is >> m_cur_time;
+      GotoNextLine(is);
+   }
+#else 
+
    // Current time
    is >> m_cur_time;
    GotoNextLine(is);
+#endif
 
    // Time step size
    is >> m_dt;
@@ -600,6 +637,12 @@ void PeleLM::initLevelDataFromPlt(int a_lev,
    }
 
    amrex::Print() << " initData on level " << a_lev << " from pltfile " << a_dataPltFile << "\n";
+   if(pltfileSource == "LM"){
+     amrex::Print() << " Assuming pltfile was generated in LM/LMeX \n"; 
+   }
+   else if(pltfileSource == "C"){
+     amrex::Print() << " Assuming pltfile was generated in PeleC \n"; 
+   }
 
    // Use PelePhysics PltFileManager
    pele::physics::pltfilemanager::PltFileManager pltData(a_dataPltFile);
@@ -614,7 +657,14 @@ void PeleLM::initLevelDataFromPlt(int a_lev,
 #endif
    for (int i = 0; i < plt_vars.size(); ++i) {
       std::string firstChars = plt_vars[i].substr(0, 2);
-      if (plt_vars[i] == "temp")            idT = i;
+      
+      if(pltfileSource == "LM"){
+        if (plt_vars[i] == "temp")            idT = i; 
+      }
+      else if(pltfileSource == "C"){
+        if (plt_vars[i] == "Temp")            idT = i; 
+      }
+      if (plt_vars[i] == "x_velocity")      idV = i; 
       if (plt_vars[i] == "x_velocity")      idV = i;
       if (firstChars == "Y(" && idY < 0 ) {  // species might not be ordered in the order of the current mech.
          idY = i;
@@ -628,10 +678,14 @@ void PeleLM::initLevelDataFromPlt(int a_lev,
    if ( idY < 0 ) {
       Abort("Coudn't find species mass fractions in pltfile");
    }
+   else if(idT < 0){
+      Abort("Coudn't find temperature in pltfile");
+   }
    Print() << " " << nSpecPlt << " species found in pltfile, starting with " << plt_vars[idY] << "\n";
 
    // Get level data
    auto ldata_p = getLevelDataPtr(a_lev,AmrNewTime);
+
 
    // Velocity
    pltData.fillPatchFromPlt(a_lev, geom[a_lev], idV, VELX, AMREX_SPACEDIM,
@@ -657,6 +711,27 @@ void PeleLM::initLevelDataFromPlt(int a_lev,
          }
       }
       if (!foundSpec) ldata_p->state.setVal(0.0,FIRSTSPEC+i,1);
+   }
+
+   // Converting units when pltfile is coming from PeleC solution
+   if(pltfileSource == "C"){
+      amrex::Print() << " Converting CGS to MKS units... \n";
+#ifdef AMREX_USE_OMP
+#pragma omp parallel if (Gpu::notInLaunchRegion())
+#endif
+      for (MFIter mfi(ldata_p->state,TilingIfNotGPU()); mfi.isValid(); ++mfi)
+      {
+         const Box& bx = mfi.tilebox();
+         auto  const &vel_arr   = ldata_p->state.array(mfi,VELX);
+         amrex::ParallelFor(bx, [=]
+         AMREX_GPU_DEVICE (int i, int j, int k) noexcept
+         {
+            for (int n = 0; n < AMREX_SPACEDIM; n++){
+               amrex::Real vel_mks = vel_arr(i,j,k,n) * 0.01;
+               vel_arr(i,j,k,n) = vel_mks;
+            }
+         });
+      }
    }
 
 #ifdef PELE_USE_EFIELD

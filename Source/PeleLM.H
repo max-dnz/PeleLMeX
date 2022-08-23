@@ -524,7 +524,7 @@ class PeleLM : public amrex::AmrCore {
    // I/O
    void WritePlotFile();
    bool writePlotNow();
-   bool checkMessage();
+   bool checkMessage(const std::string &a_action);
    void WriteCheckPointFile();
    void ReadCheckPointFile();
    bool writeCheckNow();
@@ -741,6 +741,8 @@ class PeleLM : public amrex::AmrCore {
    // EB
 
    void makeEBGeometry();
+
+   int getRestartEBMaxLevel();
 
    void initialRedistribution();
 
@@ -1075,6 +1077,7 @@ class PeleLM : public amrex::AmrCore {
    // IO options
    std::string m_restart_chkfile{""};
    std::string m_restart_pltfile{""};
+   std::string pltfileSource{"LM"};
    std::string m_plot_file{"plt"};
    std::string m_check_file{"chk"};
    int m_derivePlotVarCount = 0;
@@ -1091,6 +1094,7 @@ class PeleLM : public amrex::AmrCore {
    int m_plot_grad_p = 1;
    int m_ioDigits = 5;
    amrex::Vector<std::string> m_evaluatePlotVars;
+   bool m_write_hdf5_pltfile = false;
 
    //-----------------------------------------------------------------------------
    // ALGORITHM
@@ -1101,6 +1105,7 @@ class PeleLM : public amrex::AmrCore {
    amrex::Real m_cfl          = 0.7;
    amrex::Real m_fixed_dt     = -1.0;
    amrex::Real m_init_dt      = -1.0;
+   amrex::Real m_min_dt       = 1.0e-12;
    amrex::Real m_dtshrink     = 1.0;
    amrex::Real m_prev_dt      = -1.0;
    amrex::Real m_dtChangeMax  = 1.1;
@@ -1232,6 +1237,7 @@ class PeleLM : public amrex::AmrCore {
    int m_EB_refine_LevMin = -1;
    int m_EB_refine_LevAdapt = -1;
    int m_signDistNeeded = 0;
+   int m_EB_generate_max_level = -1;
    amrex::Real m_derefineEBBuffer = 3.0;
    std::unique_ptr<amrex::MultiFab> m_signedDist0 = nullptr;
    amrex::Vector<amrex::Real> coveredState_h;
