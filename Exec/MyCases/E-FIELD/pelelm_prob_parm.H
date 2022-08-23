@@ -17,7 +17,7 @@ struct ProbParm
    amrex::Real Zmax = 0.015; //Maximum size in z direction of the calculation zone : set equal to Xmax
    
    //Definition of the inflow conditions
-   amrex::Real Yin = 0.004; //Height of the inflow entrance at t=0s
+   amrex::Real Yin = 0.002; //Height of the inflow entrance at t=0s
    
    amrex::Real V_fu = 0.15; //Speed of the fuel in inflow (m/s)
    amrex::Real V_ox = 0.031; //Speed of the oxidizer in inflow
@@ -34,10 +34,10 @@ struct ProbParm
    //Definition of the ignition zone
    int do_ignition = 1; //Do you want to do ignition ?
    amrex::Real ign_rad = 0.001; //Size of the ignition blob
-   int ign_T = 1800; //Temperature inside the ignition blob (in Kelvin)
+   int ign_T = 1900; //Temperature inside the ignition blob (in Kelvin)
    
    //Definition of the fuel parameters
-   amrex::Real dilution = 1.0; //Proportion of CH4 in the fuel mix. Ch4 is diluted in N2
+   amrex::Real dilution = 0.7; //Proportion of CH4 in the fuel mix. Ch4 is diluted in N2
   
    int  meanFlowDir = 1;
    amrex::Real phiV_loy = 0.0_rt;

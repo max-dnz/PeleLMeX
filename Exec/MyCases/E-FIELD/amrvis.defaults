@@ -17,8 +17,8 @@ reservesystemcolors   24
 reservesystemcolors   34
 reservesystemcolors   0
 extrapalettewidth     0
-showboxes             FALSE
-#showboxes             TRUE
+#showboxes             FALSE
+showboxes             TRUE
 windowheight          550
 windowwidth           800
 windowheight          750

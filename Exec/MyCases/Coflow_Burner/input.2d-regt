@@ -56,14 +56,14 @@ peleLM.fuel_name = CH4
 
 #amr.restart = chk02000
 #amr.regrid_on_restart = 1
-amr.check_int = 200
-amr.plot_int = 1000
-amr.max_step = 10000
+amr.check_int = 2000
+amr.plot_int = 100
+amr.max_step = 1000
 amr.dt_shrink = 0.1
 #amr.stop_time = 1.1
 #amr.stop_time = 1.00
 #amr.cfl = 0.035
-amr.cfl = 0.1
+amr.cfl = 0.01
 amr.derive_plot_vars = avg_pressure mag_vort mass_fractions
 amr.grid_log            = grdlog       # name of grid logging file
 
