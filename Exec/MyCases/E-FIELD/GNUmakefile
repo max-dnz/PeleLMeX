@@ -20,11 +20,11 @@ USE_CUDA        = FALSE
 USE_HIP         = FALSE
 
 # PeleLMeX
-USE_EFIELD      = TRUE
+USE_EFIELD      = FALSE
 
 # PelePhysics
 Chemistry_Model = methaneIons_diRenzo
-Eos_Model	    = Fuego
+Eos_Model	 = Fuego
 Transport_Model = Simple
 
 include $(PELELMEX_HOME)/Utils/Make.PeleLMeX
